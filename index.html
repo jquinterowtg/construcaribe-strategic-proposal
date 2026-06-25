@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Propuesta Estratégica | Construcaribe 2.0 x WTG</title>
+    <title>Construcaribe 2.0 | Alianza Financiada WTG</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <script>
         tailwind.config = {
@@ -24,12 +25,31 @@
                             card: '#0f172a',
                             blue: '#1e3a8a',
                             cyan: '#06b6d4',
-                            accent: '#f97316',
-                            text: '#94a3b8'
+                            accent: '#f59e0b', /* Gold/Amber for premium feel */
+                            text: '#94a3b8',
+                            success: '#10b981',
+                            danger: '#ef4444'
                         }
                     },
-                    backgroundImage: {
-                        'grid-pattern': "url(\"data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0V0zm20 20h20v20H20V20zM0 20h20v20H0V20z' fill='%231e293b' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E\")",
+                    animation: {
+                        'pulse-glow': 'pulseGlow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'shine': 'shine 3s linear infinite',
+                        'border-flow': 'borderFlow 4s linear infinite',
+                    },
+                    keyframes: {
+                        pulseGlow: {
+                            '0%, 100%': { opacity: 1, boxShadow: '0 0 20px rgba(6, 182, 212, 0.4), inset 0 0 15px rgba(6, 182, 212, 0.2)' },
+                            '50%': { opacity: .8, boxShadow: '0 0 40px rgba(6, 182, 212, 0.8), inset 0 0 30px rgba(6, 182, 212, 0.4)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        borderFlow: {
+                            '0%, 100%': { backgroundPosition: '0% 50%' },
+                            '50%': { backgroundPosition: '100% 50%' },
+                        }
                     }
                 }
             }
@@ -40,386 +60,437 @@
         body { background-color: #020617; color: #f8fafc; overflow-x: hidden; }
         h1, h2, h3, h4, h5, h6 { font-family: 'Outfit', sans-serif; }
         
-        /* Glassmorphism */
-        .glass {
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        .bg-tech-grid {
+            background-image: 
+                linear-gradient(to right, rgba(30, 58, 138, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(30, 58, 138, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            background-position: center center;
+        }
+
+        .glass-premium {
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.5);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         
-        .glass-hover:hover {
-            border-color: rgba(6, 182, 212, 0.4);
-            background: rgba(15, 23, 42, 0.8);
+        .glass-premium:hover {
+            background: rgba(15, 23, 42, 0.7);
+            border-color: rgba(6, 182, 212, 0.3);
             transform: translateY(-5px);
+            box-shadow: 0 40px 80px -10px rgba(6, 182, 212, 0.2);
+            z-index: 10;
         }
 
-        /* Texto Gradiente */
-        .text-gradient {
-            background: linear-gradient(135deg, #06b6d4, #3b82f6);
+        .text-glow { text-shadow: 0 0 30px currentColor; }
+        
+        .text-gradient-gold {
+            background: linear-gradient(135deg, #f59e0b, #fbbf24, #f59e0b);
+            background-size: 200% auto;
+            color: transparent;
             -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .text-gradient-accent {
-            background: linear-gradient(135deg, #f97316, #fbbf24);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
         }
 
-        /* Scrollbar */
+        /* Timeline Styles */
+        .timeline-line {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, #06b6d4, #f59e0b);
+            border-radius: 4px;
+            z-index: 0;
+        }
+
+        .timeline-dot {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #020617;
+            border: 4px solid #06b6d4;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.6);
+        }
+
+        /* Risk Reversal Banner */
+        .risk-reversal-border {
+            position: relative;
+            background: #0f172a;
+            border-radius: 1.5rem;
+            z-index: 1;
+        }
+        .risk-reversal-border::before {
+            content: '';
+            position: absolute;
+            top: -2px; right: -2px; bottom: -2px; left: -2px;
+            background: linear-gradient(45deg, #ef4444, #0f172a, #ef4444, #0f172a);
+            background-size: 400% 400%;
+            z-index: -1;
+            border-radius: 1.6rem;
+            animation: borderFlow 6s ease infinite;
+        }
+
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #020617; }
         ::-webkit-scrollbar-thumb { background: #1e3a8a; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #06b6d4; }
-        
-        /* Glow effects */
-        .glow-cyan { text-shadow: 0 0 20px rgba(6, 182, 212, 0.5); }
-        .glow-box-cyan { box-shadow: 0 0 30px rgba(6, 182, 212, 0.15); }
     </style>
 </head>
-<body class="antialiased bg-grid-pattern relative">
+<body class="antialiased bg-tech-grid relative">
 
-    <!-- Efectos de iluminación de fondo -->
     <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
-        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-brand-cyan/10 rounded-full blur-[120px]"></div>
-        <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-brand-blue/20 rounded-full blur-[120px]"></div>
+        <div class="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-brand-cyan/20 rounded-full blur-[150px] animate-float"></div>
+        <div class="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-brand-accent/10 rounded-full blur-[150px] animate-float" style="animation-delay: -3s;"></div>
     </div>
 
-    <!-- Navegación Sticky -->
-    <nav class="fixed w-full z-50 glass border-b-0 border-white/10 transition-all duration-300">
+    <nav class="fixed w-full z-50 glass-premium border-t-0 border-r-0 border-l-0 transition-all duration-300">
         <div class="container mx-auto px-6 py-4 flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-gradient-to-br from-brand-cyan to-brand-blue rounded-xl flex items-center justify-center font-bold text-white text-xl">W</div>
-                <span class="font-heading font-bold text-xl tracking-wider">WTG <span class="text-brand-text font-light text-sm hidden md:inline ml-2">| Strategic Proposal</span></span>
+                <div class="w-10 h-10 bg-gradient-to-br from-brand-cyan to-brand-blue rounded-lg flex items-center justify-center font-bold text-white text-xl shadow-[0_0_15px_rgba(6,182,212,0.5)]">W</div>
+                <div class="flex flex-col">
+                    <span class="font-heading font-black text-lg leading-none">WTG <span class="text-brand-cyan">Tech</span></span>
+                </div>
             </div>
-            <div class="hidden md:flex gap-6 text-sm font-medium text-brand-text">
-                <a href="#alcance" class="hover:text-white transition-colors">Alcance Técnico</a>
-                <a href="#tiempo" class="hover:text-white transition-colors">Framework 21 Días</a>
-                <a href="#inversion" class="hover:text-white transition-colors text-brand-cyan">Inversión</a>
+            <div class="hidden md:flex gap-8 text-sm font-semibold text-brand-text">
+                <a href="#alcance" class="hover:text-white transition-all">1. Alcance Full</a>
+                <a href="#garantia" class="hover:text-white transition-all">2. Framework 21 Días</a>
+                <a href="#finanzas" class="text-brand-accent font-bold hover:text-white transition-all flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-brand-accent animate-pulse shadow-[0_0_10px_#f59e0b]"></span> 3. Financiación y Canje
+                </a>
             </div>
-            <a href="#inversion" class="bg-white/10 hover:bg-white/20 text-white px-5 py-2 rounded-full text-sm font-semibold transition-colors border border-white/10">Ver Presupuesto</a>
+            <a href="#finanzas" class="bg-brand-accent hover:bg-yellow-400 text-brand-dark px-6 py-2 rounded-full text-sm font-bold transition-all shadow-[0_0_15px_rgba(245,158,11,0.4)]">Ver Plan de Pagos</a>
         </div>
     </nav>
 
-    <!-- PORTADA (HERO) -->
-    <section class="min-h-[90vh] flex flex-col justify-center items-center pt-24 pb-12 px-6 relative">
-        <div class="container mx-auto max-w-4xl text-center" data-aos="fade-up" data-aos-duration="1000">
-            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border-brand-cyan/30 text-brand-cyan text-xs font-bold mb-6 tracking-widest uppercase">
-                <i class="fas fa-lock text-[10px]"></i> Documento Confidencial
+    <section class="min-h-screen flex flex-col justify-center items-center pt-32 pb-12 px-6 relative">
+        <div class="container mx-auto max-w-5xl text-center relative z-10" data-aos="zoom-out" data-aos-duration="1500">
+            
+            <div class="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-brand-cyan/10 border border-brand-cyan/30 text-brand-cyan text-xs font-black mb-8 tracking-widest uppercase shadow-[0_0_20px_rgba(6,182,212,0.2)]">
+                <i class="fas fa-handshake"></i> Acuerdo de Desarrollo 2026
             </div>
             
-            <h1 class="text-5xl md:text-7xl font-black mb-6 leading-tight">
-                Propuesta de Transformación Digital:<br>
-                <span class="text-gradient">Construcaribe 2.0</span>
+            <h1 class="text-5xl md:text-7xl lg:text-8xl font-black mb-6 leading-tight">
+                Crecimiento Real,<br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-300 to-white">Flujo de Caja Protegido.</span>
             </h1>
             
-            <p class="text-lg md:text-xl text-brand-text mb-10 max-w-2xl mx-auto leading-relaxed">
-                El plan técnico y estratégico para convertir el catálogo impreso líder del Atlántico en el <strong class="text-white">ecosistema PropTech de mayor conversión</strong> en la región.
+            <p class="text-lg md:text-2xl text-gray-400 mb-12 max-w-3xl mx-auto font-light leading-relaxed">
+                Escuchamos a Camacol. Mantenemos el <strong class="text-white">alcance tecnológico 100% completo</strong> para vencer a la competencia, pero estructuramos un modelo financiero basado en **Canje Corporativo y Financiación a 3 meses**.
             </p>
 
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-left max-w-3xl mx-auto mb-12">
-                <div class="glass p-4 rounded-xl">
-                    <p class="text-[10px] text-brand-text uppercase font-bold mb-1">Para</p>
-                    <p class="text-sm font-semibold">Gerencia Gral.<br>Camacol Atlántico</p>
-                </div>
-                <div class="glass p-4 rounded-xl">
-                    <p class="text-[10px] text-brand-text uppercase font-bold mb-1">De</p>
-                    <p class="text-sm font-semibold">Equipo Estratégico<br>WTG</p>
-                </div>
-                <div class="glass p-4 rounded-xl">
-                    <p class="text-[10px] text-brand-text uppercase font-bold mb-1">Emisión</p>
-                    <p class="text-sm font-semibold">24 de Junio<br>2026</p>
-                </div>
-                <div class="glass p-4 rounded-xl border-brand-accent/30">
-                    <p class="text-[10px] text-brand-accent uppercase font-bold mb-1">Vigencia</p>
-                    <p class="text-sm font-semibold text-white">15 Días Calendario<br>(Hasta Jul 9, 2026)</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ALCANCE TÉCNICO -->
-    <section id="alcance" class="py-24 relative border-t border-white/5 bg-brand-dark/50">
-        <div class="container mx-auto px-6 max-w-6xl">
-            <div class="mb-16" data-aos="fade-right">
-                <span class="text-brand-cyan font-bold tracking-widest uppercase text-sm">Sección 1</span>
-                <h2 class="text-4xl md:text-5xl font-black mb-4 mt-2">Alcance del Proyecto</h2>
-                <p class="text-brand-text text-lg max-w-2xl">La solución tecnológica se divide en 4 ejes fundamentales que renuevan los activos digitales de la marca e integran inteligencia de negocios.</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <!-- EJE 1 -->
-                <div class="glass p-8 rounded-3xl glass-hover transition-all duration-300" data-aos="fade-up" data-aos-delay="100">
-                    <div class="w-14 h-14 bg-brand-cyan/10 rounded-2xl flex items-center justify-center text-brand-cyan text-2xl mb-6 border border-brand-cyan/20">
-                        <i class="fas fa-layer-group"></i>
+            <div class="flex flex-col sm:flex-row gap-6 justify-center items-center">
+                <a href="#alcance" class="group flex items-center gap-3 text-brand-text hover:text-white transition-colors">
+                    <div class="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center group-hover:border-brand-cyan transition-colors">
+                        <i class="fas fa-arrow-down group-hover:translate-y-1 transition-transform"></i>
                     </div>
-                    <h3 class="text-2xl font-bold mb-4">EJE 1: Smart Marketplace</h3>
-                    <p class="text-brand-text text-sm mb-6 leading-relaxed">Desarrollo desde cero del nuevo portal transaccional diseñado con metodología <em>Mobile-First</em> y enfocado en la conversión (CRO).</p>
-                    <ul class="space-y-3">
-                        <li class="flex items-start gap-3 text-sm text-gray-300">
-                            <i class="fas fa-check-circle text-brand-cyan mt-1"></i>
-                            <span><strong>Buscador Avanzado:</strong> Filtros de nueva generación por cuota, subsidios (Mi Casa Bacana), área y geolocalización.</span>
-                        </li>
-                        <li class="flex items-start gap-3 text-sm text-gray-300">
-                            <i class="fas fa-check-circle text-brand-cyan mt-1"></i>
-                            <span><strong>Fichas Enriquecidas:</strong> Soporte para Tours Virtuales 360°, galerías HD y cotizadores por unidad.</span>
-                        </li>
-                        <li class="flex items-start gap-3 text-sm text-gray-300">
-                            <i class="fas fa-check-circle text-brand-cyan mt-1"></i>
-                            <span><strong>Perfil de Comprador:</strong> Cuentas para guardar favoritos y capturar data real de la demanda.</span>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- EJE 2 -->
-                <div class="glass p-8 rounded-3xl glass-hover transition-all duration-300" data-aos="fade-up" data-aos-delay="200">
-                    <div class="w-14 h-14 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-400 text-2xl mb-6 border border-blue-500/20">
-                        <i class="fas fa-map-marked-alt"></i>
+                    <span class="font-semibold text-sm tracking-wide">Validar Tecnología</span>
+                </a>
+                <a href="#finanzas" class="group flex items-center gap-3 text-brand-accent hover:text-yellow-400 transition-colors">
+                    <div class="w-10 h-10 rounded-full border border-brand-accent/50 flex items-center justify-center group-hover:bg-brand-accent/10 transition-colors">
+                        <i class="fas fa-chart-pie group-hover:scale-110 transition-transform"></i>
                     </div>
-                    <h3 class="text-2xl font-bold mb-4">EJE 2: Dominio SEO & GEO</h3>
-                    <p class="text-brand-text text-sm mb-6 leading-relaxed">Arquitectura de posicionamiento en motores de búsqueda para dominar el Caribe y capturar tráfico de alta intención de compra.</p>
-                    <ul class="space-y-3">
-                        <li class="flex items-start gap-3 text-sm text-gray-300">
-                            <i class="fas fa-check-circle text-blue-400 mt-1"></i>
-                            <span><strong>SEO Técnico e Indexación:</strong> Estructuración para capturar búsquedas transaccionales (ej. "Comprar VIS Puerto Colombia").</span>
-                        </li>
-                        <li class="flex items-start gap-3 text-sm text-gray-300">
-                            <i class="fas fa-check-circle text-blue-400 mt-1"></i>
-                            <span><strong>Estrategia GEO-Localizada:</strong> Optimización en mapas para encontrar oferta exactamente en las zonas deseadas.</span>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- EJE 3 -->
-                <div class="glass p-8 rounded-3xl glass-hover transition-all duration-300" data-aos="fade-up" data-aos-delay="300">
-                    <div class="w-14 h-14 bg-purple-500/10 rounded-2xl flex items-center justify-center text-purple-400 text-2xl mb-6 border border-purple-500/20">
-                        <i class="fas fa-chart-network"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold mb-4">EJE 3: Analítica de Datos (BI)</h3>
-                    <p class="text-brand-text text-sm mb-6 leading-relaxed">Transformamos datos estáticos en inteligencia accionable para las constructoras afiliadas y Camacol.</p>
-                    <ul class="space-y-3">
-                        <li class="flex items-start gap-3 text-sm text-gray-300">
-                            <i class="fas fa-check-circle text-purple-400 mt-1"></i>
-                            <span><strong>Web & Geo-Analytics:</strong> Google Analytics 4 avanzado y mapas de calor (Heatmaps).</span>
-                        </li>
-                        <li class="flex items-start gap-3 text-sm text-gray-300">
-                            <i class="fas fa-check-circle text-purple-400 mt-1"></i>
-                            <span><strong>Dashboards de Demanda:</strong> Reportes en tiempo real sobre barrios buscados y subsidios solicitados. Monetización de data complementaria a Coordenada Urbana.</span>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- EJE 4 -->
-                <div class="glass p-8 rounded-3xl glass-hover transition-all duration-300 border-l-4 border-l-brand-accent" data-aos="fade-up" data-aos-delay="400">
-                    <div class="absolute top-0 right-0 bg-brand-accent text-white text-[10px] font-black px-3 py-1 rounded-bl-xl rounded-tr-3xl uppercase tracking-wider">Killer Feature</div>
-                    <div class="w-14 h-14 bg-brand-accent/10 rounded-2xl flex items-center justify-center text-brand-accent text-2xl mb-6 border border-brand-accent/20">
-                        <i class="fas fa-robot"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold mb-4">EJE 4: Motor Leads IA & CRM</h3>
-                    <p class="text-brand-text text-sm mb-6 leading-relaxed">Respetamos la infraestructura interna actual. Creamos un puente inteligente hacia sus herramientas (Integración Bidireccional).</p>
-                    <ul class="space-y-3">
-                        <li class="flex items-start gap-3 text-sm text-gray-300">
-                            <i class="fas fa-check-circle text-brand-accent mt-1"></i>
-                            <span><strong>Motor IA Conversacional:</strong> Chatbot WhatsApp 24/7 que precalifica al cliente antes de enviarlo al asesor humano.</span>
-                        </li>
-                        <li class="flex items-start gap-3 text-sm text-gray-300">
-                            <i class="fas fa-check-circle text-brand-accent mt-1"></i>
-                            <span><strong>Integración CRM Bidireccional:</strong> Conexión directa. Cada prospecto cae en el embudo correcto etiquetado por IA.</span>
-                        </li>
-                        <li class="flex items-start gap-3 text-sm text-gray-300">
-                            <i class="fas fa-check-circle text-brand-accent mt-1"></i>
-                            <span><strong>Trazabilidad del ROI:</strong> Demuestre a los afiliados exactamente cuántos leads les inyectan al mes.</span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- TIEMPO & GARANTÍA -->
-    <section id="tiempo" class="py-24 relative overflow-hidden">
-        <!-- Background elements -->
-        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl h-64 bg-brand-cyan/5 blur-[120px] rounded-full pointer-events-none"></div>
-
-        <div class="container mx-auto px-6 max-w-5xl relative z-10">
-            <div class="text-center mb-16" data-aos="fade-up">
-                <span class="text-brand-cyan font-bold tracking-widest uppercase text-sm">Sección 2</span>
-                <h2 class="text-4xl md:text-5xl font-black mb-4 mt-2">El Factor Tiempo</h2>
-                <p class="text-brand-text text-lg max-w-2xl mx-auto">La velocidad de salida al mercado es crítica. Mientras el desarrollo tradicional tomaría de 4 a 6 meses, en WTG aplicamos nuestro Framework propietario.</p>
-            </div>
-
-            <!-- Framework 21 Días -->
-            <div class="bg-brand-card/80 backdrop-blur-md rounded-3xl p-8 md:p-12 border border-brand-cyan/20 shadow-2xl mb-12" data-aos="zoom-in">
-                <div class="flex flex-col md:flex-row items-center gap-10">
-                    <div class="md:w-1/3 text-center md:text-left border-b md:border-b-0 md:border-r border-white/10 pb-8 md:pb-0 md:pr-8">
-                        <div class="text-7xl font-black text-gradient mb-2 leading-none glow-cyan">21</div>
-                        <h4 class="text-2xl font-bold text-white tracking-wider uppercase">Días Exactos</h4>
-                        <p class="text-brand-text text-sm mt-3">Para ensamblar, personalizar y lanzar la tecnología garantizada.</p>
-                    </div>
-                    
-                    <div class="md:w-2/3">
-                        <div class="relative border-l-2 border-brand-cyan/30 pl-8 space-y-8">
-                            <div class="relative">
-                                <div class="absolute w-4 h-4 bg-brand-cyan rounded-full -left-[41px] top-1 shadow-[0_0_10px_#06b6d4]"></div>
-                                <h5 class="text-lg font-bold text-white">Semana 1</h5>
-                                <p class="text-brand-text text-sm mt-1">Despliegue Core, Migración de los 122 proyectos y Diseño UX/UI Mobile-First.</p>
-                            </div>
-                            <div class="relative">
-                                <div class="absolute w-4 h-4 bg-blue-500 rounded-full -left-[41px] top-1 shadow-[0_0_10px_#3b82f6]"></div>
-                                <h5 class="text-lg font-bold text-white">Semana 2</h5>
-                                <p class="text-brand-text text-sm mt-1">Arquitectura SEO, Motores de Filtros y Configuración de Analítica Avanzada.</p>
-                            </div>
-                            <div class="relative">
-                                <div class="absolute w-4 h-4 bg-brand-accent rounded-full -left-[41px] top-1 shadow-[0_0_10px_#f97316]"></div>
-                                <h5 class="text-lg font-bold text-white">Semana 3</h5>
-                                <p class="text-brand-text text-sm mt-1">Entrenamiento de la IA, Integraciones con CRM actual, Pruebas de Estrés y <strong>Go-Live</strong>.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Garantía Skin in the game -->
-            <div class="bg-gradient-to-r from-red-900/20 to-brand-card border border-red-500/30 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center gap-6" data-aos="fade-up">
-                <div class="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center text-red-500 text-3xl shrink-0">
-                    <i class="fas fa-shield-alt"></i>
-                </div>
-                <div>
-                    <h4 class="text-xl font-bold text-white mb-2">Garantía Incondicional (Skin in the Game)</h4>
-                    <p class="text-gray-400 text-sm leading-relaxed">
-                        Estamos tan seguros de nuestra eficiencia que ponemos nuestro dinero en juego. Si el ecosistema no está listo en el Día 21 (por causas atribuibles a WTG), aplicaremos una <strong>penalidad del 10% de descuento sobre nuestra propuesta por cada semana de retraso</strong>, hasta llegar a un 50% de descuento máximo.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- INVERSIÓN Y MODELO -->
-    <section id="inversion" class="py-24 border-t border-white/5 bg-brand-dark">
-        <div class="container mx-auto px-6 max-w-6xl">
-            <div class="text-center mb-16" data-aos="fade-up">
-                <span class="text-brand-accent font-bold tracking-widest uppercase text-sm">Sección 3</span>
-                <h2 class="text-4xl md:text-5xl font-black mb-4 mt-2">Estructura de Inversión</h2>
-                <p class="text-brand-text text-lg max-w-2xl mx-auto">Tratado comercial con riesgo mitigado, diseñado para demostrar ROI real a Camacol antes del pago final.</p>
-                <p class="text-[10px] text-gray-500 mt-2 uppercase">* Valores COP calculados a TRM $3,600 para referencia.</p>
-            </div>
-
-            <!-- FASE 1: Setup -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-16">
-                <!-- Main Pricing -->
-                <div class="lg:col-span-7 glass p-8 md:p-10 rounded-3xl relative overflow-hidden" data-aos="fade-right">
-                    <div class="absolute top-0 right-0 bg-brand-accent text-white text-xs font-bold px-4 py-1 rounded-bl-xl">FASE 1: SETUP LLAVE EN MANO</div>
-                    
-                    <h3 class="text-2xl font-bold mb-2">Desarrollo e Implementación</h3>
-                    <p class="text-brand-text text-sm mb-8">Ecosistema Full 4 Ejes (Web, IA, Analítica, Integración CRM) en 21 Días.</p>
-
-                    <div class="mb-6 opacity-50">
-                        <p class="text-xs font-bold text-gray-400 uppercase tracking-wide">Inversión Regular</p>
-                        <p class="text-2xl font-bold line-through decoration-red-500">$ 19,500 USD <span class="text-sm font-normal">(~ $70,200,000 COP)</span></p>
-                    </div>
-
-                    <div class="bg-gradient-to-r from-brand-accent/20 to-transparent p-5 rounded-xl border border-brand-accent/30 mb-8">
-                        <div class="flex items-center gap-2 mb-2">
-                            <i class="fas fa-bolt text-brand-accent"></i>
-                            <p class="text-xs font-bold text-brand-accent uppercase tracking-wide">Fast-Track Bonus (-10% OFF)</p>
-                        </div>
-                        <p class="text-4xl font-black text-white">$ 17,550 <span class="text-xl">USD</span></p>
-                        <p class="text-sm font-medium text-gray-300 mt-1">~ $ 63,180,000 COP</p>
-                        <p class="text-[10px] text-gray-400 mt-2">Válido únicamente con aprobación y firma en las primeras 24 horas.</p>
-                    </div>
-                </div>
-
-                <!-- Plan de Pagos -->
-                <div class="lg:col-span-5 glass p-8 md:p-10 rounded-3xl flex flex-col justify-center border-t-4 border-t-brand-cyan" data-aos="fade-left">
-                    <h4 class="text-lg font-bold mb-6 flex items-center gap-2">
-                        <i class="fas fa-calendar-check text-brand-cyan"></i> Pagos de Riesgo Mitigado
-                    </h4>
-                    
-                    <div class="space-y-6">
-                        <div class="border-l-2 border-gray-600 pl-4">
-                            <p class="text-xs text-brand-cyan font-bold uppercase">Inicio (Día 0)</p>
-                            <p class="text-lg font-bold text-white">40% Anticipo</p>
-                            <p class="text-sm text-gray-400">$ 7,020 USD <span class="text-xs">(~ $25.2M COP)</span></p>
-                        </div>
-                        <div class="border-l-2 border-brand-cyan pl-4 relative">
-                            <div class="absolute -left-[5px] top-2 w-2 h-2 bg-brand-cyan rounded-full"></div>
-                            <p class="text-xs text-brand-cyan font-bold uppercase">Go-Live (Día 21)</p>
-                            <p class="text-lg font-bold text-white">30% Contra Entrega</p>
-                            <p class="text-sm text-gray-400">$ 5,265 USD <span class="text-xs">(~ $18.9M COP)</span></p>
-                        </div>
-                        <div class="border-l-2 border-brand-accent pl-4 relative">
-                            <div class="absolute -left-[5px] top-2 w-2 h-2 bg-brand-accent rounded-full shadow-[0_0_8px_#f97316]"></div>
-                            <p class="text-xs text-brand-accent font-bold uppercase">Día 60</p>
-                            <p class="text-lg font-bold text-white">30% Saldo Final</p>
-                            <p class="text-sm text-gray-400">$ 5,265 USD <span class="text-xs">(~ $18.9M COP)</span></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Bono de confianza -->
-            <div class="bg-gradient-to-r from-brand-blue/30 to-brand-card border border-brand-blue/50 rounded-2xl p-6 text-center mb-16" data-aos="zoom-in">
-                <p class="text-lg font-semibold text-white">
-                    <span class="text-2xl mr-2">🎁</span> <strong class="text-brand-cyan">Bono de Confianza WTG:</strong> Damos 39 días entre la salida en vivo (Día 21) y el cobro final (Día 60) con <strong class="text-white">soporte y mantenimiento 100% gratuito</strong> para que vean la plataforma facturando.
-                </p>
-            </div>
-
-            <!-- FASE 2: Mantenimiento -->
-            <h3 class="text-3xl font-black text-center mb-10" data-aos="fade-up">Fase 2: Sostenimiento Evolutivo (Post-Día 60)</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <!-- Opción A -->
-                <div class="glass p-8 rounded-2xl border border-brand-cyan/30 relative" data-aos="fade-up" data-aos-delay="100">
-                    <div class="absolute top-0 right-1/2 transform translate-x-1/2 -translate-y-1/2 bg-brand-cyan text-brand-dark text-xs font-black px-4 py-1 rounded-full uppercase">Recomendado</div>
-                    <h4 class="text-xl font-bold text-white mb-2 text-center mt-2">Opción A: Gestionado por WTG</h4>
-                    <p class="text-sm text-brand-text text-center mb-6 h-10">Servidores Nube, Consumo API WhatsApp/IA y soporte a integraciones asumido por WTG.</p>
-                    <div class="text-center mb-6">
-                        <p class="text-4xl font-black text-white">$ 950 <span class="text-lg text-brand-cyan">USD / mes</span></p>
-                        <p class="text-sm text-gray-400 mt-1">~ $ 3,420,000 COP</p>
-                    </div>
-                </div>
-
-                <!-- Opción B -->
-                <div class="glass p-8 rounded-2xl border border-white/10" data-aos="fade-up" data-aos-delay="200">
-                    <h4 class="text-xl font-bold text-white mb-2 text-center mt-2">Opción B: Póliza Evolutiva</h4>
-                    <p class="text-sm text-brand-text text-center mb-6 h-10">Camacol aloja en sus servidores y paga APIS. WTG cobra póliza de evolución y mantenimiento.</p>
-                    <div class="text-center mb-6">
-                        <p class="text-4xl font-black text-white">$ 600 <span class="text-lg text-gray-400">USD / mes</span></p>
-                        <p class="text-sm text-gray-400 mt-1">~ $ 2,160,000 COP</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- CTA & PRÓXIMOS PASOS -->
-    <section class="py-24 relative overflow-hidden bg-gradient-to-b from-brand-dark to-brand-card">
-        <div class="container mx-auto px-6 text-center relative z-10" data-aos="zoom-in">
-            <h2 class="text-4xl md:text-5xl font-black text-white mb-6">Próximos Pasos (Día 0)</h2>
-            <p class="text-xl text-brand-text mb-10 max-w-2xl mx-auto">
-                Para aplicar al incentivo <strong>Fast-Track (-10%)</strong> y bloquear a nuestro escuadrón de desarrollo, necesitamos su firma de aprobación de este documento en las próximas 24 horas.
-            </p>
-            
-            <div class="flex flex-col sm:flex-row justify-center items-center gap-6">
-                <button onclick="window.print()" class="glass hover:bg-white/10 text-white font-bold py-4 px-8 rounded-full transition-all flex items-center justify-center">
-                    <i class="fas fa-file-pdf mr-3"></i> Guardar PDF
-                </button>
-                <a href="mailto:gerencia@camacol.co?subject=Aprobacion%20Propuesta%20WTG" class="bg-brand-cyan hover:bg-cyan-400 text-brand-dark font-black py-4 px-10 rounded-full transition-all transform hover:scale-105 shadow-[0_0_20px_rgba(6,182,212,0.4)] flex items-center justify-center">
-                    <i class="fas fa-signature mr-3"></i> Aprobar Propuesta Hoy
+                    <span class="font-semibold text-sm tracking-wide">Ver Modelo de Pagos</span>
                 </a>
             </div>
         </div>
     </section>
 
-    <footer class="bg-black py-8 border-t border-white/5 text-center text-xs text-brand-text">
-        <div class="container mx-auto">
-            <p class="mb-2"><strong>CONFIDENCIALIDAD:</strong> Este documento es propiedad intelectual de WTG y contiene metodologías y modelos de negocio de uso exclusivo para Camacol Atlántico.</p>
-            <p>&copy; 2026 WTG Strategic Tech. Todos los derechos reservados.</p>
-        </div>
-    </footer>
+    <section id="alcance" class="py-24 relative border-t border-white/5 bg-gradient-to-b from-transparent to-brand-card/50">
+        <div class="container mx-auto px-6 max-w-7xl">
+            <div class="mb-16 text-center" data-aos="fade-up">
+                <h2 class="text-4xl md:text-5xl font-black mb-4">El Ecosistema (Sin Recortes)</h2>
+                <p class="text-gray-400 text-lg max-w-3xl mx-auto">Para competir con los gigantes PropTech, no podemos entregar tecnología a medias. Construcaribe 2.0 incluirá el poder absoluto de WTG.</p>
+            </div>
 
-    <!-- Scripts -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+                <!-- EJE 1 -->
+                <div class="glass-premium p-8 rounded-[2rem] group" data-aos="fade-up" data-aos-delay="100">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 bg-brand-cyan/20 rounded-xl flex items-center justify-center text-brand-cyan text-2xl border border-brand-cyan/30 shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+                            <i class="fas fa-laptop-house"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white">1. Smart Marketplace</h3>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">Buscador avanzado (filtros de cuota mensual, Mi Casa Bacana, área), fichas de proyecto con Tours 360° y UX Mobile-First orientada a conversión.</p>
+                </div>
+
+                <!-- EJE 2 -->
+                <div class="glass-premium p-8 rounded-[2rem] group" data-aos="fade-up" data-aos-delay="200">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 bg-blue-500/20 rounded-xl flex items-center justify-center text-blue-400 text-2xl border border-blue-500/30">
+                            <i class="fas fa-map-marked-alt"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white">2. SEO & Estrategia GEO</h3>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">Arquitectura de posicionamiento para dominar las búsquedas de "alta intención de compra" en Google para el Atlántico y vistas por mapas interactivos.</p>
+                </div>
+
+                <!-- EJE 3 -->
+                <div class="glass-premium p-8 rounded-[2rem] group" data-aos="fade-up" data-aos-delay="300">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 bg-purple-500/20 rounded-xl flex items-center justify-center text-purple-400 text-2xl border border-purple-500/30">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white">3. Business Intelligence</h3>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">Mapas de calor (Heatmaps) y Dashboards de Demanda en tiempo real para entender los barrios y presupuestos más solicitados por los compradores.</p>
+                </div>
+
+                <!-- EJE 4 -->
+                <div class="glass-premium p-8 rounded-[2rem] group" data-aos="fade-up" data-aos-delay="400">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 bg-brand-success/20 rounded-xl flex items-center justify-center text-brand-success text-2xl border border-brand-success/30 shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white">4. Motor IA y CRM</h3>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">Chatbot de WhatsApp 24/7 para precalificar clientes e integración bidireccional directa con el CRM actual de la constructora afiliada.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="garantia" class="py-24 relative bg-brand-dark">
+        <div class="container mx-auto px-6 max-w-5xl text-center relative z-10" data-aos="zoom-in">
+            <h2 class="text-3xl md:text-4xl font-black text-white mb-10">La Promesa WTG: Framework 21 Días</h2>
+            
+            <div class="risk-reversal-border p-8 md:p-12 text-center relative overflow-hidden">
+                <!-- Icono de Seguridad -->
+                <div class="w-20 h-20 mx-auto bg-brand-danger/10 rounded-full flex items-center justify-center text-brand-danger text-4xl mb-6 border border-brand-danger/30 shadow-[0_0_30px_rgba(239,68,68,0.4)]">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                
+                <h3 class="text-2xl md:text-3xl font-black text-white mb-4">Garantía Incondicional <span class="text-brand-danger">"Skin in the Game"</span></h3>
+                
+                <p class="text-gray-300 text-base md:text-lg max-w-2xl mx-auto mb-8 font-light leading-relaxed">
+                    Si el ecosistema no está listo para salir en vivo en el <strong>Día 21</strong>, aplicaremos una penalidad del <strong class="text-white bg-brand-danger/20 px-2 py-1 rounded">10% de descuento</strong> sobre nuestra propuesta por cada semana de retraso (hasta un 50%).
+                </p>
+
+                <div class="inline-flex items-center gap-2 text-xs text-gray-500 font-mono uppercase tracking-wider bg-black/40 px-4 py-2 rounded-full border border-white/5">
+                    <i class="fas fa-info-circle"></i> Aplica cumpliendo los tiempos de entrega pactados.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="finanzas" class="py-24 border-t border-white/5 bg-brand-card/30 relative overflow-hidden">
+        <div class="absolute right-0 top-0 w-[500px] h-[500px] bg-brand-accent/5 rounded-full blur-[100px] pointer-events-none"></div>
+
+        <div class="container mx-auto px-6 max-w-6xl relative z-10">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <span class="inline-block px-4 py-1.5 rounded-full bg-brand-accent/10 text-brand-accent font-black tracking-widest uppercase text-xs mb-4 border border-brand-accent/30 shadow-[0_0_15px_rgba(245,158,11,0.3)]">Modelo Económico</span>
+                <h2 class="text-4xl md:text-5xl font-black mb-6 text-white">Inversión y Financiación a 3 Meses</h2>
+                <p class="text-gray-400 text-lg max-w-3xl mx-auto">Protegemos el flujo de caja actual de Camacol mediante un bono de canje comercial directo y dividiendo el saldo en plazos que acompañan el retorno de inversión.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                
+                <!-- Columna Izquierda: La Matemática del Trato -->
+                <div class="glass-premium p-8 md:p-10 rounded-[2.5rem]" data-aos="fade-right">
+                    <h3 class="text-2xl font-black text-white mb-8 border-b border-white/10 pb-4">Liquidación del Desarrollo</h3>
+                    
+                    <div class="space-y-6">
+                        <!-- Valor Real -->
+                        <div class="flex justify-between items-center opacity-70">
+                            <span class="text-gray-400 font-medium text-sm md:text-base">Valor Comercial (Ecosistema Full)</span>
+                            <span class="text-xl font-bold text-white line-through decoration-brand-danger decoration-2">$ 70,000,000</span>
+                        </div>
+                        
+                        <!-- Bono Canje -->
+                        <div class="flex justify-between items-center bg-brand-success/10 p-4 md:p-5 rounded-2xl border border-brand-success/30 transform hover:scale-105 transition-transform cursor-help group relative">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-brand-success/20 rounded-full flex items-center justify-center text-brand-success"><i class="fas fa-handshake"></i></div>
+                                <div>
+                                    <span class="text-brand-success font-bold block leading-tight">Bono Alianza (Canje)</span>
+                                    <span class="text-xs text-brand-success/70">Aporte Camacol Atlántico</span>
+                                </div>
+                            </div>
+                            <span class="text-2xl font-black text-brand-success">- $ 20,000,000</span>
+
+                            <!-- Tooltip -->
+                            <div class="absolute -top-16 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-4 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-xl border border-gray-700 z-20">
+                                Incluye: Stand Evento Noviembre + Data Afiliados B2B
+                            </div>
+                        </div>
+
+                        <!-- TOTAL -->
+                        <div class="flex justify-between items-end pt-6 border-t border-white/20">
+                            <span class="text-white font-black text-lg uppercase tracking-wider">Nueva Inversión (A Financiar)</span>
+                            <div class="text-right">
+                                <p class="text-4xl md:text-5xl font-black text-brand-cyan drop-shadow-[0_0_15px_rgba(6,182,212,0.5)]"><span class="text-2xl text-white mr-1">$</span>50.0M <span class="text-xl text-white font-medium">COP</span></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Opciones de Mantenimiento -->
+                    <div class="mt-10 p-5 bg-black/30 rounded-2xl border border-white/5">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Sostenimiento Post-Lanzamiento</p>
+                        <div class="flex flex-col gap-2">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-300">Opción A (Full Nube WTG):</span>
+                                <span class="text-white font-semibold">$3.420.000 / mes</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-300">Opción B (Servidor Camacol):</span>
+                                <span class="text-white font-semibold">$2.160.000 / mes</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Columna Derecha: Línea de Tiempo (Plan de Pagos) -->
+                <div class="relative py-4" data-aos="fade-left">
+                    <div class="timeline-line hidden md:block"></div>
+                    
+                    <h3 class="text-2xl font-black text-center text-white mb-10 relative z-10 bg-brand-card inline-block px-6 rounded-full border border-white/10 left-1/2 transform -translate-x-1/2">Plan de Pagos a 90 Días</h3>
+
+                    <div class="space-y-6 relative z-10">
+                        
+                        <!-- Cuota 1 -->
+                        <div class="relative flex items-center justify-between md:justify-normal group">
+                            <div class="timeline-dot top-1/2 -translate-y-1/2 hidden md:block group-hover:scale-125 transition-transform bg-brand-cyan"></div>
+                            <div class="w-full md:w-5/12 glass-premium p-5 rounded-2xl border-l-4 border-brand-cyan hover:border-brand-cyan transition-colors ml-auto md:ml-0 md:mr-auto">
+                                <span class="text-[10px] text-brand-cyan font-black uppercase tracking-widest block mb-1">Cuota 1 - Día 0</span>
+                                <div class="flex justify-between items-end mb-2">
+                                    <h4 class="text-xl font-bold text-white">Anticipo (40%)</h4>
+                                    <span class="text-2xl font-black text-white">$20M</span>
+                                </div>
+                                <p class="text-xs text-gray-400">Facturación a la firma para iniciar el desarrollo del proyecto.</p>
+                            </div>
+                        </div>
+
+                        <!-- Cuota 2 -->
+                        <div class="relative flex items-center justify-between md:justify-normal group">
+                            <div class="timeline-dot top-1/2 -translate-y-1/2 hidden md:block group-hover:scale-125 transition-transform bg-blue-500 border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.6)]"></div>
+                            <div class="w-full md:w-5/12 glass-premium p-5 rounded-2xl border-l-4 border-blue-500 hover:border-blue-500 transition-colors ml-auto md:ml-auto md:mr-0">
+                                <span class="text-[10px] text-blue-400 font-black uppercase tracking-widest block mb-1">Cuota 2 - Día 30</span>
+                                <div class="flex justify-between items-end mb-2">
+                                    <h4 class="text-xl font-bold text-white">Salida en Vivo (20%)</h4>
+                                    <span class="text-2xl font-black text-white">$10M</span>
+                                </div>
+                                <p class="text-xs text-gray-400">Ecosistema en línea y generando los primeros leads para afiliados.</p>
+                            </div>
+                        </div>
+
+                        <!-- Cuota 3 -->
+                        <div class="relative flex items-center justify-between md:justify-normal group">
+                            <div class="timeline-dot top-1/2 -translate-y-1/2 hidden md:block group-hover:scale-125 transition-transform bg-yellow-500 border-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.6)]"></div>
+                            <div class="w-full md:w-5/12 glass-premium p-5 rounded-2xl border-l-4 border-yellow-500 hover:border-yellow-500 transition-colors ml-auto md:ml-0 md:mr-auto">
+                                <span class="text-[10px] text-yellow-400 font-black uppercase tracking-widest block mb-1">Cuota 3 - Día 60</span>
+                                <div class="flex justify-between items-end mb-2">
+                                    <h4 class="text-xl font-bold text-white">Consolidación (20%)</h4>
+                                    <span class="text-2xl font-black text-white">$10M</span>
+                                </div>
+                                <p class="text-xs text-gray-400">Mes de validación operativa e inteligencia de mercado activa.</p>
+                            </div>
+                        </div>
+
+                        <!-- Cuota 4 -->
+                        <div class="relative flex items-center justify-between md:justify-normal group">
+                            <div class="timeline-dot top-1/2 -translate-y-1/2 hidden md:block group-hover:scale-125 transition-transform bg-brand-success border-brand-success shadow-[0_0_15px_rgba(16,185,129,0.6)]"></div>
+                            <div class="w-full md:w-5/12 glass-premium p-5 rounded-2xl border-l-4 border-brand-success hover:border-brand-success transition-colors ml-auto md:ml-auto md:mr-0">
+                                <span class="text-[10px] text-brand-success font-black uppercase tracking-widest block mb-1">Cuota 4 - Día 90</span>
+                                <div class="flex justify-between items-end mb-2">
+                                    <h4 class="text-xl font-bold text-white">Liquidación (20%)</h4>
+                                    <span class="text-2xl font-black text-brand-success">$10M</span>
+                                </div>
+                                <p class="text-xs text-gray-400">Pago final tras 3 meses de impacto digital comprobado.</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section class="py-32 relative overflow-hidden bg-gradient-to-b from-brand-dark to-[#000]">
+        <div class="container mx-auto px-6 text-center relative z-10" data-aos="zoom-in">
+            <h2 class="text-4xl md:text-6xl font-black text-white mb-6">El Trato Win-Win está sobre la mesa</h2>
+            <p class="text-lg md:text-xl text-gray-300 mb-10 max-w-2xl mx-auto font-light">
+                Combinamos nuestra mejor tecnología con su capacidad de exposición gremial. Eliminamos el bloqueo financiero para que Camacol evolucione hoy.
+            </p>
+            <button onclick="aprobarAcuerdo()" class="bg-brand-accent hover:bg-yellow-400 text-brand-dark font-black py-5 px-12 rounded-full transition-all duration-500 transform hover:scale-110 shadow-[0_0_40px_rgba(245,158,11,0.6)] flex items-center justify-center text-xl mx-auto group">
+                <i class="fas fa-file-signature mr-3 group-hover:animate-bounce"></i> Aprobar Modelo Financiado
+            </button>
+        </div>
+    </section>
+
+    <!-- Modal Cierre Exitoso -->
+    <div id="successOverlay" class="fixed inset-0 z-[9999] bg-[#020617] flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-700">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-brand-cyan/30 via-[#020617] to-black z-0"></div>
+        <div class="relative z-10 text-center flex flex-col items-center px-4 w-full">
+            <div id="successContent" class="transition-all duration-1000 transform scale-75 opacity-0 absolute flex flex-col items-center">
+                <div class="w-24 h-24 bg-brand-success rounded-full flex items-center justify-center text-white text-5xl mb-8 shadow-[0_0_50px_rgba(16,185,129,0.8)]">
+                    <i class="fas fa-check"></i>
+                </div>
+                <h1 class="text-5xl md:text-7xl font-black text-white mb-4 leading-none">
+                    ACUERDO ACEPTADO
+                </h1>
+                <p class="text-brand-cyan text-xl md:text-2xl font-mono tracking-widest uppercase mb-8">
+                    Preparando Kick-Off Técnico (Día 0)
+                </p>
+                <button onclick="location.reload()" class="border border-white/30 text-white hover:bg-white/10 px-8 py-3 rounded-full backdrop-blur-md transition-all">
+                    Volver al documento
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT DE ANIMACIONES AOS (Este faltaba) -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script type="module" src="/main.js"></script>
+
+    <script>
+        // Inicializar animaciones al scrollear
+        document.addEventListener('DOMContentLoaded', function() {
+            if(typeof AOS !== 'undefined') {
+                AOS.init({ once: true, duration: 1000, offset: 100 });
+            }
+        });
+
+        // Función del botón final (Animación WOW)
+        function aprobarAcuerdo() {
+            const overlay = document.getElementById('successOverlay');
+            const content = document.getElementById('successContent');
+            
+            // Mostrar Overlay
+            overlay.classList.remove('opacity-0', 'pointer-events-none');
+            overlay.classList.add('opacity-100', 'pointer-events-auto');
+            
+            // Animar contenido central
+            setTimeout(() => {
+                content.classList.remove('opacity-0', 'scale-75');
+                content.classList.add('opacity-100', 'scale-100');
+                dispararConfetiVIP();
+            }, 300);
+        }
+
+        // Lógica del Confeti
+        function dispararConfetiVIP() {
+            if(typeof confetti === 'undefined') return;
+            var duration = 3 * 1000;
+            var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 10000, colors: ['#f59e0b', '#06b6d4', '#ffffff'] };
+
+            function randomInRange(min, max) { return Math.random() * (max - min) + min; }
+
+            var interval = setInterval(function() {
+                var timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) { return clearInterval(interval); }
+                var particleCount = 50 * (timeLeft / duration);
+                
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
+        }
+    </script>
 </body>
 </html>
